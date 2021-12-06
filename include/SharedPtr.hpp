@@ -64,12 +64,11 @@ SharedPtr<T>::SharedPtr(SharedPtr&& r)
 template<typename T>
 SharedPtr<T>::~SharedPtr()
 {
-  if (_counter != nullptr){
-    _counter--;
-    if (_counter == 0){
+  if (_counter != nullptr) _counter--;
+
+  if (_counter == 0){
       delete _counter;
       delete _ptr;
-    }
   }
 }
 
