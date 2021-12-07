@@ -56,8 +56,9 @@ TEST(SharedPtr, Bool) {
 
 TEST(SharedPtr, GetObject) {
   auto* str = new std::string("C++");
-  SharedPtr <std::string> p(str);
-  EXPECT_EQ(p->length(), 3);
+  auto* p = new SharedPtr <std::string> (str);
+  EXPECT_EQ((*p)->length(), 3);
+  delete p;
 }
 
 TEST(SharedPtr, Reset) {
