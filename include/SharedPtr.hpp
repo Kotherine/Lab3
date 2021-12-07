@@ -47,6 +47,7 @@ SharedPtr<T>::SharedPtr(T* ptr)
     : _ptr(ptr),
       _counter (new std::atomic_uint(1))
 {
+  ptr = nullptr;
 }
 
 template<typename T>
@@ -64,12 +65,11 @@ SharedPtr<T>::SharedPtr(SharedPtr&& r)
 template<typename T>
 SharedPtr<T>::~SharedPtr()
 {
-  if (_counter == nullptr)
-    return;
-  (_counter)--;
-  if (_counter == 0) {
-    delete _ptr;
-    delete _counter;
+  if (_counter != nullptr) _counter--;
+
+  if (_counter == 0){
+      delete _counter;
+      delete _ptr;
   }
 }
 
