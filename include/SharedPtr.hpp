@@ -44,10 +44,9 @@ SharedPtr<T>::SharedPtr()
 
 template<typename T>
 SharedPtr<T>::SharedPtr(T* ptr)
-    : _ptr(ptr),
-      _counter (new std::atomic_uint(1))
 {
-  ptr = nullptr;
+  _ptr = ptr;
+  _counter = new std::atomic_uint(1);
 }
 
 template<typename T>
