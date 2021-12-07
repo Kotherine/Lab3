@@ -12,7 +12,6 @@ TEST(SharedPtr, DefaultConstructor) {
 TEST(SharedPtr, InitConstructor) {
   int* a = new int(5);
   SharedPtr p = SharedPtr(a);
-  delete a;
   EXPECT_EQ(p.get(), a);
   EXPECT_EQ(p.use_count(), 1);
 }
@@ -67,7 +66,6 @@ TEST(SharedPtr, Reset) {
   int* a = new int(15);
   SharedPtr <int> p1(a);
   p.reset(a);
-  delete a;
   EXPECT_EQ(*p, *p1);
 }
 
