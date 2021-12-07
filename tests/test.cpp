@@ -7,7 +7,6 @@ TEST(SharedPtr, DefaultConstructor) {
   SharedPtr <int> p = SharedPtr<int>();
   EXPECT_EQ(p.get(), nullptr);
   EXPECT_EQ(p.use_count(), 0);
-  p.~SharedPtr();
 }
 
 TEST(SharedPtr, InitConstructor) {
@@ -15,8 +14,6 @@ TEST(SharedPtr, InitConstructor) {
   SharedPtr p = SharedPtr(a);
   EXPECT_EQ(p.get(), a);
   EXPECT_EQ(p.use_count(), 1);
-  delete a;
-  p.~SharedPtr();
 }
 
 TEST(SharedPtr, CopyConstructor) {
@@ -25,8 +22,6 @@ TEST(SharedPtr, CopyConstructor) {
   EXPECT_EQ(*p2, *p1);
   EXPECT_EQ(p1.use_count(), 2);
   EXPECT_EQ(p2.use_count(), 2);
-  p1.~SharedPtr();
-  p2.~SharedPtr();
 }
 
 TEST(SharedPtr, MoveConstructor) {
@@ -38,9 +33,6 @@ TEST(SharedPtr, MoveConstructor) {
   EXPECT_EQ(*p2, 0);
   EXPECT_EQ(p1.get(), nullptr);
   EXPECT_EQ(p2.use_count(), 1);
-  p.~SharedPtr();
-  p1.~SharedPtr();
-  p2.~SharedPtr();
 }
 
 TEST(SharedPtr, Equal) {
@@ -53,9 +45,6 @@ TEST(SharedPtr, Equal) {
   EXPECT_EQ(*p2, 10);
   EXPECT_EQ(p.get(), nullptr);
   EXPECT_EQ(p2.use_count(), 2);
-  p.~SharedPtr();
-  p1.~SharedPtr();
-  p2.~SharedPtr();
 }
 
 TEST(SharedPtr, Bool) {
@@ -63,14 +52,11 @@ TEST(SharedPtr, Bool) {
   EXPECT_TRUE(p);
   SharedPtr <int> p1;
   EXPECT_FALSE(p1);
-  p.~SharedPtr();
-  p1.~SharedPtr();
 }
 
 TEST(SharedPtr, GetObject) {
   SharedPtr <std::string> p(new std::string ("C++"));
   EXPECT_EQ(p->length(), 3);
-  p.~SharedPtr();
 }
 
 TEST(SharedPtr, Reset) {
@@ -82,8 +68,6 @@ TEST(SharedPtr, Reset) {
   p.reset(a);
   EXPECT_EQ(*p, *p1);
   delete a;
-  p.~SharedPtr();
-  p1.~SharedPtr();
 }
 
 TEST(SharedPtr, Swap) {
@@ -95,7 +79,4 @@ TEST(SharedPtr, Swap) {
   EXPECT_EQ(p1.use_count(), 2);
   EXPECT_EQ(*p2, 10);
   EXPECT_EQ(p2.use_count(), 1);
-  p1.~SharedPtr();
-  p2.~SharedPtr();
-  p3.~SharedPtr();
 }
