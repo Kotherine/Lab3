@@ -66,8 +66,8 @@ TEST(SharedPtr, Reset) {
   EXPECT_FALSE(p);
   int* a = new int(15);
   SharedPtr <int> p1(a);
-  delete a;
   p.reset(a);
+  delete a;
   EXPECT_EQ(*p, *p1);
 }
 
