@@ -52,14 +52,12 @@ SharedPtr<T>::SharedPtr(T* ptr)
 template<typename T>
 SharedPtr<T>::SharedPtr(const SharedPtr& r)
 {
-  _counter = nullptr;
   *this = r;
 }
 
 template<typename T>
 SharedPtr<T>::SharedPtr(SharedPtr&& r)
 {
-  _counter = nullptr;
   *this = std::move(r);
 }
 
@@ -76,7 +74,8 @@ SharedPtr<T>::~SharedPtr()
 
 template<typename T>
 auto SharedPtr<T>::operator=(const SharedPtr& r) -> SharedPtr&{
-  if (this != &r) {
+  if(this!=&r) {
+    this->~SharedPtr();
     _ptr = r._ptr;
     _counter = r._counter;
     if (_counter != nullptr) (*_counter)++;
@@ -87,12 +86,12 @@ auto SharedPtr<T>::operator=(const SharedPtr& r) -> SharedPtr&{
 template<typename T>
 auto SharedPtr<T>::operator=(SharedPtr&& r) -> SharedPtr&{
   if (this != &r) {
+    this->~SharedPtr();
     _ptr = r._ptr;
     _counter = r._counter;
     r._counter = nullptr;
     r._ptr = nullptr;
   }
-  r.~SharedPtr();
   return *this;
 }
 
