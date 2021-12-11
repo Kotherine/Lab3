@@ -52,12 +52,14 @@ SharedPtr<T>::SharedPtr(T* ptr)
 template<typename T>
 SharedPtr<T>::SharedPtr(const SharedPtr& r)
 {
+  _counter = nullptr;
   *this = r;
 }
 
 template<typename T>
 SharedPtr<T>::SharedPtr(SharedPtr&& r)
 {
+  _counter = nullptr;
   *this = std::move(r);
 }
 
