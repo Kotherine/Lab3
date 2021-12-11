@@ -31,7 +31,8 @@ class SharedPtr {
   void reset();
   void reset(T* ptr);
   void swap(SharedPtr& r);
-  // возвращает количество объектов SharedPtr, которые ссылаются на тот же управляемый объект
+  // возвращает количество объектов SharedPtr,
+  // которые ссылаются на тот же управляемый объект
   [[nodiscard]] auto use_count() const -> size_t;
 };
 
@@ -79,7 +80,7 @@ auto SharedPtr<T>::operator=(const SharedPtr &r) -> SharedPtr & {
 
   p = r.p;
   c = r.c;
-  (*c) ++;
+  (*c)++;
 
   return *this;
 }
