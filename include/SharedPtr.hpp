@@ -67,8 +67,8 @@ SharedPtr<T>::~SharedPtr()
   if (_counter != nullptr) _counter--;
 
   if (_counter == 0){
-      delete _counter;
-      delete _ptr;
+    delete _counter;
+    delete _ptr;
   }
 }
 
@@ -90,6 +90,7 @@ auto SharedPtr<T>::operator=(SharedPtr&& r) -> SharedPtr&{
     r._counter = nullptr;
     r._ptr = nullptr;
   }
+  r.~SharedPtr();
   return *this;
 }
 
@@ -138,3 +139,4 @@ auto SharedPtr<T>::use_count() const -> size_t{
 }
 
 #endif // INCLUDE_SHAREDPTR_HPP_
+

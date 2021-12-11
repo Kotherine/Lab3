@@ -23,7 +23,6 @@ TEST(SharedPtr, CopyConstructor) {
   EXPECT_EQ(*p2, *p1);
   EXPECT_EQ(p1.use_count(), 2);
   EXPECT_EQ(p2.use_count(), 2);
-  delete a;
 }
 
 TEST(SharedPtr, MoveConstructor) {
