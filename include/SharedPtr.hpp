@@ -52,23 +52,31 @@ SharedPtr<T>::SharedPtr(T* ptr)
 template<typename T>
 SharedPtr<T>::SharedPtr(const SharedPtr& r)
 {
-  *this = r;
+  _ptr = r._ptr;
+  _counter = r._counter;
+  ++(*_counter);
 }
 
 template<typename T>
 SharedPtr<T>::SharedPtr(SharedPtr&& r)
 {
-  *this = std::move(r);
+  _ptr = r._ptr;
+  _counter = r._counter;
+  r._ptr = nullptr;
+  r._counter = nullptr;
 }
 
 template<typename T>
 SharedPtr<T>::~SharedPtr()
 {
-  if (_counter != nullptr) _counter--;
-
-  if (_counter == 0){
-    delete _counter;
-    delete _ptr;
+  if (_counter != nullptr) {
+    (*_counter)--;
+    if ((*_counter) == 0) {
+      delete _counter;
+      _counter = nullptr;
+      delete _ptr;
+      _ptr = nullptr;
+    }
   }
 }
 

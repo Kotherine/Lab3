@@ -63,11 +63,11 @@ TEST(SharedPtr, Reset) {
   SharedPtr p(a);
   p.reset();
   EXPECT_FALSE(p);
-  int* b = new int(15);
-  SharedPtr p1(b);
-  p.reset(b);
-  EXPECT_EQ(*p, *p1);
-}
+  SharedPtr p1(new int(15));
+  int* b = new int(20);
+  p1.reset(b);
+  EXPECT_EQ(*p1, 20);
+  }
 
 TEST(SharedPtr, Swap) {
   SharedPtr p1(new int(10));
