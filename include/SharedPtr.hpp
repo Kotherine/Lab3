@@ -9,14 +9,13 @@
 
 template <typename T>
 class SharedPtr {
-
  private:
   T* p; //указатель
   std::atomic_uint* c; //счетчик указателей
 
  public:
   SharedPtr();
-  SharedPtr(T* ptr);
+  explicit SharedPtr(T* ptr);
   SharedPtr(const SharedPtr& r);
   SharedPtr(SharedPtr&& r);
   ~SharedPtr();
@@ -38,26 +37,26 @@ class SharedPtr {
 
 template<typename T>
 SharedPtr<T>::SharedPtr() {
-  p= nullptr;
-  c= nullptr;
+  p = nullptr;
+  c = nullptr;
 }
 
 template<typename T>
 SharedPtr<T>::SharedPtr(T *ptr) {
-  p= ptr;
-  c= new std::atomic_uint{1};
+  p = ptr;
+  c = new std::atomic_uint{1};
 }
 
 template<typename T>
 SharedPtr<T>::SharedPtr(const SharedPtr &r) {
-  c= nullptr;
-  *this=r;
+  c = nullptr;
+  *this = r;
 }
 
 template<typename T>
 SharedPtr<T>::SharedPtr(SharedPtr &&r) {
-  c= nullptr;
-  *this=std::move(r);
+  c = nullptr;
+  *this = std::move(r);
 }
 
 template<typename T>
@@ -73,29 +72,29 @@ SharedPtr<T>::~SharedPtr() {
 
 template<typename T>
 auto SharedPtr<T>::operator=(const SharedPtr &r) -> SharedPtr & {
-  if(this==&r)
+  if (this == &r)
     return *this;
 
   this->~SharedPtr();
 
-  p=r.p;
-  c=r.c;
-  (*c)++;
+  p = r.p;
+  c = r.c;
+  (*c) ++;
 
   return *this;
 }
 
 template<typename T>
 auto SharedPtr<T>::operator=(SharedPtr &&r) -> SharedPtr & {
-  if(this==&r)
+  if (this == &r)
     return *this;
 
   this->~SharedPtr();
 
-  p=r.p;
-  c=r.c;
-  r.c= nullptr;
-  r.p= nullptr;
+  p = r.p;
+  c = r.c;
+  r.c = nullptr;
+  r.p = nullptr;
 
   return *this;
 }
@@ -122,12 +121,12 @@ auto SharedPtr<T>::get() -> T * {
 
 template<typename T>
 void SharedPtr<T>::reset() {
-  *this= SharedPtr();
+  *this = SharedPtr();
 }
 
 template<typename T>
 void SharedPtr<T>::reset(T *ptr) {
-  *this= SharedPtr(ptr);
+  *this = SharedPtr(ptr);
 }
 
 template<typename T>
@@ -138,7 +137,7 @@ void SharedPtr<T>::swap(SharedPtr &r) {
 
 template<typename T>
 auto SharedPtr<T>::use_count() const -> size_t {
-  if(c!= nullptr)
+  if (c != nullptr)
     return *c;
   else
     return 0;
