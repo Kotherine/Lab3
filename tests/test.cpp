@@ -1,111 +1,81 @@
 // Copyright 2021 Your Name <your_email>
-// Copyright 2021 Daria <photodoshfy@gmail.com>
-
 #include <gtest/gtest.h>
-#include <string>
-#include "SharedPtr.hpp"
+#include <SharedPtr.hpp>
+#include "string.h"
 
+TEST(SharedPtr, DefaultConstructor) {
+  SharedPtr <int> p;
+  EXPECT_EQ(p.get(), nullptr);
+  EXPECT_EQ(p.use_count(), 0);
+}
 
-TEST(SharedPtr, EmptySharedPtr) {
-  SharedPtr <std::string> r;
-  ASSERT_EQ(r.get(), nullptr);
+TEST(SharedPtr, InitConstructor) {
+  SharedPtr p(new int(5));
+  EXPECT_EQ(*p, 5);
+  EXPECT_EQ(p.use_count(), 1);
 }
-TEST(SharedPtr, InitializationSharedPtr) {
-  SharedPtr <std::string> r(new std::string{"Hello, world!"});
-  ASSERT_EQ(*r, "Hello, world!");
-  ASSERT_EQ(r.use_count(), 1);
-}
+
 TEST(SharedPtr, CopyConstructor) {
-  const SharedPtr <std::string> r(new std::string{"Hello, world!"});
-  SharedPtr <std::string> p(r);
-  ASSERT_EQ(*p, "Hello, world!");
-  ASSERT_EQ(p.use_count(), 2);
+  const SharedPtr p1(new int(-1));
+  SharedPtr p2 = SharedPtr (p1);
+  EXPECT_EQ(*p2, *p1);
+  EXPECT_EQ(p1.use_count(), 2);
+  EXPECT_EQ(p2.use_count(), 2);
 }
+
 TEST(SharedPtr, MoveConstructor) {
-  SharedPtr <std::string> r(new std::string{"Hello, world!"});
-  SharedPtr <std::string> p(std::move(r));
-  ASSERT_EQ(*p, "Hello, world!");
-  ASSERT_EQ(p.use_count(), 1);
-  ASSERT_EQ(r.get(), nullptr);
-
-  SharedPtr <std::string> q(SharedPtr<std::string>(new std::string{"Hello"}));
-  ASSERT_EQ(*q, "Hello");
-  ASSERT_EQ(q.use_count(), 1);
+  SharedPtr p(SharedPtr(new int(7)));
+  EXPECT_EQ(*p, 7);
+  EXPECT_EQ(p.use_count(), 1);
+  SharedPtr p1(new int (0));
+  SharedPtr p2(std::move(p1));
+  EXPECT_EQ(*p2, 0);
+  EXPECT_EQ(p1.get(), nullptr);
+  EXPECT_EQ(p2.use_count(), 1);
 }
-TEST(SharedPtr, CopyAssignment) {
-  SharedPtr<std::string> r(new std::string{"SharedPtr"});
-  SharedPtr<std::string> p(r);
-  ASSERT_EQ(*p, "SharedPtr");
-  ASSERT_EQ(p.use_count(), 2);
-  ASSERT_EQ(r.use_count(), 2);
 
-  SharedPtr<std::string> q(new std::string{"ScopedPtr"});
-  ASSERT_EQ(q.use_count(), 1);
-
-  p= q;
-  ASSERT_EQ(*p, "ScopedPtr");
-  ASSERT_EQ(p.use_count(), 2);
-  ASSERT_EQ(r.use_count(), 2);
-  ASSERT_EQ(q.use_count(), 2);
-
-  SharedPtr<std::string> *ptr_= &p;
-  p= *ptr_;
-  ASSERT_EQ(*p, "ScopedPtr");
-  ASSERT_EQ(p.use_count(), 2);
+TEST(SharedPtr, Equal) {
+  SharedPtr p(new int(10));
+  SharedPtr p1 = p;
+  EXPECT_EQ(*p, *p1);
+  EXPECT_EQ(p.use_count(), 2);
+  EXPECT_EQ(p1.use_count(), 2);
+  SharedPtr p2 = std::move(p);
+  EXPECT_EQ(*p2, 10);
+  EXPECT_EQ(p.get(), nullptr);
+  EXPECT_EQ(p2.use_count(), 2);
 }
-TEST(SharedPtr, MoveAssignment) {
-  SharedPtr <std::string> r(new std::string{"SharedPtr"});
-  SharedPtr <std::string> p(r);
-  ASSERT_EQ(*p, "SharedPtr");
-  ASSERT_EQ(p.use_count(), 2);
-  ASSERT_EQ(r.use_count(), 2);
 
-  SharedPtr <std::string> q(new std::string{"ScopedPtr"});
-  SharedPtr <std::string> z(q);
-  ASSERT_EQ(*z, "ScopedPtr");
-  ASSERT_EQ(z.use_count(), 2);
-  ASSERT_EQ(q.use_count(), 2);
-
-  q= std::move(p);
-  ASSERT_EQ(p.operator bool(), false);
-  ASSERT_EQ(r.use_count(), 2);
-  ASSERT_EQ(z.use_count(), 2);
-
-  SharedPtr <std::string> *ptr_;
-  ptr_ = &q;
-  q= std::move(*ptr_);
-  ASSERT_EQ(*q, "SharedPtr");
-  ASSERT_EQ(q.use_count(), 2);
+TEST(SharedPtr, Bool) {
+  SharedPtr p(new int(10));
+  EXPECT_TRUE(p);
+  SharedPtr <int> p1;
+  EXPECT_FALSE(p1);
 }
+
+TEST(SharedPtr, GetObject) {
+  SharedPtr p (new std::string("abc"));
+  EXPECT_EQ(p->length(), 3);
+}
+
 TEST(SharedPtr, Reset) {
-  SharedPtr <std::string> r(new std::string{"Reset"});
-  ASSERT_EQ(*r, "Reset");
-  ASSERT_EQ(r.use_count(), 1);
-
-  r.reset();
-  ASSERT_EQ(r.operator bool(), false);
+  int* a = new int(10);
+  SharedPtr p(a);
+  p.reset();
+  EXPECT_FALSE(p);
+  int* b = new int(15);
+  SharedPtr p1(b);
+  p.reset(b);
+  EXPECT_EQ(*p, *p1);
 }
-TEST(SharedPtr, ResetPointer) {
-  SharedPtr <std::string> r(new std::string{"ResetPointer"});
-  ASSERT_EQ(*r, "ResetPointer");
-  ASSERT_EQ(r.use_count(), 1);
 
-  r.reset(new std::string{"New"});
-  ASSERT_EQ(*r, "New");
-  ASSERT_EQ(r.use_count(), 1);
-}
 TEST(SharedPtr, Swap) {
-  SharedPtr <std::string> r(new std::string{"One"});
-  ASSERT_EQ(*r, "One");
-  ASSERT_EQ(r.use_count(), 1);
-  SharedPtr <std::string> p(new std::string{"Two"});
-  ASSERT_EQ(*p, "Two");
-  ASSERT_EQ(p.use_count(), 1);
-
-  r.swap(p);
-  ASSERT_EQ(*p, "One");
-  ASSERT_EQ(p.use_count(), 1);
-  ASSERT_EQ(*r, "Two");
-  ASSERT_EQ(r.use_count(), 1);
-  r.swap(r);
+  SharedPtr p1(new int(10));
+  SharedPtr p2(new int(4));
+  SharedPtr p3(p2);
+  p1.swap(p2);
+  EXPECT_EQ(*p1, 4);
+  EXPECT_EQ(p1.use_count(), 2);
+  EXPECT_EQ(*p2, 10);
+  EXPECT_EQ(p2.use_count(), 1);
 }

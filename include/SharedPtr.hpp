@@ -3,15 +3,14 @@
 #ifndef INCLUDE_SHAREDPTR_HPP_
 #define INCLUDE_SHAREDPTR_HPP_
 
-#include <atomic>
-#include <iostream>
-#include <utility>
-
+#include <cstdio>
+#include "atomic"
+#include "utility"
 template <typename T>
 class SharedPtr {
  private:
-  T* p; //указатель
-  std::atomic_uint* c; //счетчик указателей
+  T* _ptr;
+  std::atomic_uint* _counter;
 
  public:
   SharedPtr();
@@ -33,115 +32,112 @@ class SharedPtr {
   void swap(SharedPtr& r);
   // возвращает количество объектов SharedPtr,
   // которые ссылаются на тот же управляемый объект
-  [[nodiscard]] auto use_count() const -> size_t;
+  auto use_count() const -> size_t;
 };
 
 template<typename T>
-SharedPtr<T>::SharedPtr() {
-  p = nullptr;
-  c = nullptr;
+SharedPtr<T>::SharedPtr()
+    : _ptr(nullptr),
+      _counter(nullptr)
+{
 }
 
 template<typename T>
-SharedPtr<T>::SharedPtr(T *ptr) {
-  p = ptr;
-  c = new std::atomic_uint{1};
+SharedPtr<T>::SharedPtr(T* ptr)
+    : _ptr(ptr),
+      _counter(new std::atomic_uint{1})
+{
 }
 
 template<typename T>
-SharedPtr<T>::SharedPtr(const SharedPtr &r) {
-  c = nullptr;
+SharedPtr<T>::SharedPtr(const SharedPtr& r)
+{
   *this = r;
 }
 
 template<typename T>
-SharedPtr<T>::SharedPtr(SharedPtr &&r) {
-  c = nullptr;
+SharedPtr<T>::SharedPtr(SharedPtr&& r)
+{
   *this = std::move(r);
 }
 
 template<typename T>
-SharedPtr<T>::~SharedPtr() {
-  if (c == nullptr)
-    return;
-  (c)--;
-  if (c == 0) {
-    delete p;
-    delete c;
+SharedPtr<T>::~SharedPtr()
+{
+  if (_counter != nullptr) _counter--;
+
+  if (_counter == 0){
+    delete _counter;
+    delete _ptr;
   }
 }
 
 template<typename T>
-auto SharedPtr<T>::operator=(const SharedPtr &r) -> SharedPtr & {
-  if (this == &r)
-    return *this;
-
-  this->~SharedPtr();
-
-  p = r.p;
-  c = r.c;
-  (*c)++;
-
+auto SharedPtr<T>::operator=(const SharedPtr& r) -> SharedPtr&{
+  if (this != &r) {
+    this->~SharedPtr();
+    _ptr = r._ptr;
+    _counter = r._counter;
+    if (_counter != nullptr) (*_counter)++;
+  }
   return *this;
 }
 
 template<typename T>
-auto SharedPtr<T>::operator=(SharedPtr &&r) -> SharedPtr & {
-  if (this == &r)
-    return *this;
-
-  this->~SharedPtr();
-
-  p = r.p;
-  c = r.c;
-  r.c = nullptr;
-  r.p = nullptr;
-
+auto SharedPtr<T>::operator=(SharedPtr&& r) -> SharedPtr&{
+  if (this != &r) {
+    this->~SharedPtr();
+    _ptr = r._ptr;
+    _counter = r._counter;
+    r._counter = nullptr;
+    r._ptr = nullptr;
+  }
   return *this;
 }
 
 template<typename T>
 SharedPtr<T>::operator bool() const {
-  return p != nullptr;
+  return (_ptr != nullptr);
 }
 
 template<typename T>
 auto SharedPtr<T>::operator*() const -> T & {
-  return *p;
+  return *_ptr;
 }
 
 template<typename T>
 auto SharedPtr<T>::operator->() const -> T * {
-  return p;
+  return _ptr;
 }
 
 template<typename T>
-auto SharedPtr<T>::get() -> T * {
-  return p;
+auto SharedPtr<T>::get() -> T*{
+  return _ptr;
 }
 
 template<typename T>
-void SharedPtr<T>::reset() {
+void SharedPtr<T>::reset(){
   *this = SharedPtr();
 }
 
 template<typename T>
-void SharedPtr<T>::reset(T *ptr) {
+void SharedPtr<T>::reset(T* ptr){
   *this = SharedPtr(ptr);
 }
 
 template<typename T>
-void SharedPtr<T>::swap(SharedPtr &r) {
-  std::swap(p, r.p);
-  std::swap(c, r.c);
+void SharedPtr<T>::swap(SharedPtr<T>& r){
+  std::swap(_ptr, r._ptr);
+  std::swap(_counter, r._counter);
 }
 
 template<typename T>
-auto SharedPtr<T>::use_count() const -> size_t {
-  if (c != nullptr)
-    return *c;
-  else
+auto SharedPtr<T>::use_count() const -> size_t{
+  if (_counter == nullptr){
     return 0;
+  }
+  return *_counter;
 }
 
 #endif // INCLUDE_SHAREDPTR_HPP_
+
